@@ -1,0 +1,24 @@
+server:
+  port: 7777
+
+# Thymeleaf
+spring:
+  thymeleaf:
+    #开发配置为false,避免修改模板还要重启服务器
+    cache: false
+    # 是否启用
+    enabled: true
+    #内容类别,可不用配置
+    servlet:
+      content-type: text/html
+    # 编码方式
+    encoding: utf-8
+    # 模板的模式，支持 HTML, XML TEXT JAVASCRIPT
+    mode: HTML5
+    # 前缀
+    prefix: classpath:/templates/
+    # 后缀
+    suffix: .html
+
+
+
