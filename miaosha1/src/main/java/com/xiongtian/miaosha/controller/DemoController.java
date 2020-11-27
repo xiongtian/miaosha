@@ -1,7 +1,10 @@
 package com.xiongtian.miaosha.controller;
 
+import com.xiongtian.miaosha.domain.User;
 import com.xiongtian.miaosha.result.CodeMessage;
 import com.xiongtian.miaosha.result.Result;
+import com.xiongtian.miaosha.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
@@ -12,6 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/demo")
 @Controller
 public class DemoController {
+
+    @Autowired
+    private UserService userService;
+
 
     @RequestMapping("/")
     @ResponseBody
@@ -45,4 +52,18 @@ public class DemoController {
         return "hello";
     }
 
+
+    @RequestMapping("/db/get")
+    @ResponseBody
+    public Result<User> dbGet(){
+        User userById = userService.getUserById(1);
+        return Result.success(userById);
+    }
+
+    @RequestMapping("/db/tx")
+    @ResponseBody
+    public Result<Boolean> dbTx(){
+        userService.tx(1);
+        return Result.success(true);
+    }
 }
