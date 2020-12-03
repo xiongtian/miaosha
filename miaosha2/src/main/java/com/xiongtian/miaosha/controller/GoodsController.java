@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @Author xiongtian
  * @Date 2020/12/3 20:59
@@ -33,7 +35,7 @@ public class GoodsController {
 
 
     @RequestMapping("/to_list")
-    public String toList(Model model,
+    public String toList(HttpServletResponse response, Model model,
                          @CookieValue(value = MiaoshaUserServiceImpl.COOKIE_NAME_TOKEN,required = false) String cookieToken,
                          @RequestParam(value = MiaoshaUserServiceImpl.COOKIE_NAME_TOKEN,required = false)String paramToken
     ) {
@@ -42,7 +44,7 @@ public class GoodsController {
         }
         String token =StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
 
-        MiaoshaUser miaoshaUser = miaoshaUserService.getByToken(token);
+        MiaoshaUser miaoshaUser = miaoshaUserService.getByToken(response,token);
         model.addAttribute("user",miaoshaUser);
         return "goods_list";
 

@@ -13,6 +13,7 @@ import com.xiongtian.miaosha.vo.LoginVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.resource.HttpResource;
 
 import javax.servlet.http.Cookie;
@@ -63,21 +64,32 @@ public class MiaoshaUserServiceImpl implements MiaoshaUserService {
             throw new GlobalException(CodeMessage.PASSWORD_ERROR);
         }
 
-        // 生成cookie
-        String token = UUIDUtil.uuid();
-        redisService.set(MiaoshaUserKey.token,token,user);
-        Cookie cookie = new Cookie(COOKIE_NAME_TOKEN, token);
-        cookie.setMaxAge(MiaoshaUserKey.token.expireSeconds());
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        addCookie(response, user);
+
         return true;
     }
 
     @Override
-    public MiaoshaUser getByToken(String token) {
+    public MiaoshaUser getByToken(HttpServletResponse response, String token) {
         if (StringUtils.isEmpty(token)) {
             return null;
         }
-        return redisService.get(MiaoshaUserKey.token, token, MiaoshaUser.class);
+        MiaoshaUser user = redisService.get(MiaoshaUserKey.token, token, MiaoshaUser.class);
+        // 延长有效期
+        if (null != user) {
+            addCookie(response, user);
+        }
+        return user;
+    }
+
+
+    private void addCookie(HttpServletResponse response, MiaoshaUser user) {
+        // 生成cookie
+        String token = UUIDUtil.uuid();
+        redisService.set(MiaoshaUserKey.token, token, user);
+        Cookie cookie = new Cookie(COOKIE_NAME_TOKEN, token);
+        cookie.setMaxAge(MiaoshaUserKey.token.expireSeconds());
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 }
