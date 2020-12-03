@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
+
 /**
  * @Author xiongtian
  * @Date 2020/12/2 20:57
@@ -40,10 +42,10 @@ public class LoginController {
 
     /**
      * 登录的逻辑
-     *
+     * 没有使用校验jsr303
      * @return
      */
-    @PostMapping("/do_login")
+    /*@PostMapping("/do_login")
     @ResponseBody
     public Result<Boolean> doLogin(LoginVo loginVo) {
         log.info(loginVo.toString());
@@ -72,5 +74,22 @@ public class LoginController {
             return Result.error(codeMessage);
 
         }
+    }*/
+
+    /**
+     * 登录的逻辑
+     * 使用jsr303校验
+     *
+     * @return
+     */
+    @PostMapping("/do_login")
+    @ResponseBody
+    public Result<Boolean> doLogin(@Valid LoginVo loginVo) {
+        log.info(loginVo.toString());
+
+        //登录
+        boolean ret = miaoshaUserService.login(loginVo);
+        log.info(loginVo.getMobile()+":登录成功！");
+        return Result.success(true);
     }
 }

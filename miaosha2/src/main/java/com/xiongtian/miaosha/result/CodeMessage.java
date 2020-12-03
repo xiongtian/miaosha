@@ -11,7 +11,9 @@ public class CodeMessage {
 
     // 通用异常
     public static CodeMessage SUCCESS = new CodeMessage(0, "success");
-    public static CodeMessage SERVER_ERROR = new CodeMessage(500, "服务端异常！");
+    public static CodeMessage SERVER_ERROR = new CodeMessage(500100, "服务端异常！");
+    public static CodeMessage BIND_ERROR = new CodeMessage(500101, "参数校验异常: %s");
+
 
     // 登录模块：500,2XX
     public static CodeMessage SESSION_ERRO = new CodeMessage(500210, "Session不存在或是已经失效！");
@@ -34,6 +36,14 @@ public class CodeMessage {
         this.code = code;
         this.msg = msg;
     }
+
+    public CodeMessage fillArgs(Object... args){
+
+        int code = this.code;
+        String message = String.format(this.msg,args);
+        return new CodeMessage(code,message);
+    }
+
 
     public int getCode() {
         return code;

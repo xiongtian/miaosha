@@ -14,5 +14,5 @@ public interface MiaoshaUserService {
 
     public MiaoshaUser getById(Long id);
 
-    CodeMessage login(LoginVo loginVo);
+    boolean login(LoginVo loginVo);
 }
