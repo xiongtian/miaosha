@@ -4,6 +4,8 @@ import com.xiongtian.miaosha.domain.MiaoshaUser;
 import com.xiongtian.miaosha.result.CodeMessage;
 import com.xiongtian.miaosha.vo.LoginVo;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @Author xiongtian
  * @Date 2020/12/2 22:33
@@ -14,5 +16,7 @@ public interface MiaoshaUserService {
 
     public MiaoshaUser getById(Long id);
 
-    boolean login(LoginVo loginVo);
+    boolean login(HttpServletResponse response, LoginVo loginVo);
+
+    MiaoshaUser getByToken(String token);
 }

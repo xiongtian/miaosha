@@ -3,12 +3,20 @@ package com.xiongtian.miaosha.service.impl;
 import com.xiongtian.miaosha.dao.MiaoshaUserDao;
 import com.xiongtian.miaosha.domain.MiaoshaUser;
 import com.xiongtian.miaosha.exception.GlobalException;
+import com.xiongtian.miaosha.redis.MiaoshaUserKey;
+import com.xiongtian.miaosha.redis.RedisService;
 import com.xiongtian.miaosha.result.CodeMessage;
 import com.xiongtian.miaosha.service.MiaoshaUserService;
 import com.xiongtian.miaosha.util.MD5Util;
+import com.xiongtian.miaosha.util.UUIDUtil;
 import com.xiongtian.miaosha.vo.LoginVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.resource.HttpResource;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @Author xiongtian
@@ -19,8 +27,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class MiaoshaUserServiceImpl implements MiaoshaUserService {
 
+
+    public static final String COOKIE_NAME_TOKEN = "token";
+
     @Autowired
     MiaoshaUserDao miaoshaUserDao;
+
+    @Autowired
+    RedisService redisService;
 
     @Override
     public MiaoshaUser getById(Long id) {
@@ -29,7 +43,7 @@ public class MiaoshaUserServiceImpl implements MiaoshaUserService {
     }
 
     @Override
-    public boolean login(LoginVo loginVo) {
+    public boolean login(HttpServletResponse response, LoginVo loginVo) {
         if (null == loginVo) {
             throw new GlobalException(CodeMessage.SERVER_ERROR);
         }
@@ -49,6 +63,21 @@ public class MiaoshaUserServiceImpl implements MiaoshaUserService {
             throw new GlobalException(CodeMessage.PASSWORD_ERROR);
         }
 
+        // 生成cookie
+        String token = UUIDUtil.uuid();
+        redisService.set(MiaoshaUserKey.token,token,user);
+        Cookie cookie = new Cookie(COOKIE_NAME_TOKEN, token);
+        cookie.setMaxAge(MiaoshaUserKey.token.expireSeconds());
+        cookie.setPath("/");
+        response.addCookie(cookie);
         return true;
+    }
+
+    @Override
+    public MiaoshaUser getByToken(String token) {
+        if (StringUtils.isEmpty(token)) {
+            return null;
+        }
+        return redisService.get(MiaoshaUserKey.token, token, MiaoshaUser.class);
     }
 }

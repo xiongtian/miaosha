@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
             String msg = error.getDefaultMessage();
             return Result.error(CodeMessage.BIND_ERROR.fillArgs(msg));
         } else {
+            System.out.println("123456");
             return Result.error(CodeMessage.SERVER_ERROR);
         }
     }
