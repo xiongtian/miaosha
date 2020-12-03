@@ -23,6 +23,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public Result<String> exceptionHandler(HttpServletRequest request, Exception e) {
+
+        // 将异常打印出来
+        e.printStackTrace();
         if (e instanceof GlobalException) {
             GlobalException exception = (GlobalException) e;
             return Result.error(exception.getCodeMessage());
