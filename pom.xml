@@ -5,11 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.xiongtian</groupId>
-    <artifactId>miaosha</artifactId>
+    <artifactId>com.xiongtian.miaosha</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>miaosha1</module>
+        <module>miaosha2</module>
     </modules>
     <!--统一管理jar版本-->
     <properties>
