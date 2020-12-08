@@ -1,6 +1,8 @@
 package com.xiongtian.miaosha.service.impl;
 
 import com.xiongtian.miaosha.dao.GoodsDao;
+import com.xiongtian.miaosha.domain.Goods;
+import com.xiongtian.miaosha.domain.MiaoshaGoods;
 import com.xiongtian.miaosha.service.GoodsService;
 import com.xiongtian.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,13 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public GoodsVo getGoodsVoByGoodsId(long goodsId) {
         return goodsDao.getGoodsVoByGoodsId(goodsId);
+    }
+
+    @Override
+    public void reduceStock(GoodsVo goods) {
+        MiaoshaGoods g = new MiaoshaGoods();
+        g.setGoodsId(goods.getId());
+        goodsDao.reduceStock(g);
     }
 
 
