@@ -12,7 +12,17 @@ spring:
     mode: HTML5                       # 模板的模式，支持 HTML, XML TEXT JAVASCRIPT
     prefix: classpath:/templates/     # 前缀
     suffix: .html                     # 后缀
-
+#static
+  resources:
+    add-mappings: true
+    cache:
+      period: 3600
+    chain:
+      cache: true
+      enabled: true
+      html-application-cache: true
+      compressed: true
+    static-locations: classpath:/static/
   #Druid
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
