@@ -23,6 +23,7 @@ public class CodeMessage {
     public static CodeMessage MOBILE_NOT_EXIT = new CodeMessage(500214, "手机号不存在！");
     public static CodeMessage PASSWORD_ERROR = new CodeMessage(500215, "密码或账号错误！");
 
+
     // 商品模块：500,3XX
 
     // 订单模块：500,4XX

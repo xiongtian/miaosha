@@ -64,7 +64,7 @@ public class MiaoshaUserServiceImpl implements MiaoshaUserService {
             throw new GlobalException(CodeMessage.PASSWORD_ERROR);
         }
         String token = UUIDUtil.uuid();
-        addCookie(response,token, user);
+        addCookie(response, token, user);
 
         return true;
     }
@@ -77,13 +77,61 @@ public class MiaoshaUserServiceImpl implements MiaoshaUserService {
         MiaoshaUser user = redisService.get(MiaoshaUserKey.token, token, MiaoshaUser.class);
         // 延长有效期
         if (null != user) {
-            addCookie(response,token, user);
+            addCookie(response, token, user);
         }
         return user;
     }
 
+    /**
+     * 对象级别的缓存
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public MiaoshaUser getById(long id) {
+        // 取缓存
+        MiaoshaUser user = redisService.get(MiaoshaUserKey.getById, "" + id, MiaoshaUser.class);
+        if (null != null) {
+            return user;
+        }
+        // 取数据库
+        user = miaoshaUserDao.getById(id);
+        // 存在则存入缓存中
+        if (null != user) {
+            redisService.set(MiaoshaUserKey.getById, "" + id, user);
+        }
+        return user;
+    }
 
-    private void addCookie(HttpServletResponse response,String token, MiaoshaUser user) {
+    /**
+     * 缓存对象之后的修改密码
+     *
+     * @param id
+     * @param passwordNew
+     * @return
+     */
+    @Override
+    public boolean updatePassword(String token, long id, String passwordNew) {
+        // 取user
+        MiaoshaUser user = getById(id);
+        if (null == user) {
+            throw new GlobalException(CodeMessage.MOBILE_NOT_EXIT);
+        }
+        MiaoshaUser toBeUpdate = new MiaoshaUser();
+        toBeUpdate.setId(id);
+        toBeUpdate.setPassword(MD5Util.formPassToDBPass(passwordNew, user.getSalt()));
+        miaoshaUserDao.update(toBeUpdate);
+        // 处理缓存(删除id，更新token)
+        redisService.delete(MiaoshaUserKey.getById, "" + id);
+        user.setPassword(toBeUpdate.getPassword());
+        redisService.set(MiaoshaUserKey.token, token, user);
+
+        return true;
+    }
+
+
+    private void addCookie(HttpServletResponse response, String token, MiaoshaUser user) {
         // 生成cookie
         //String token = UUIDUtil.uuid();
         redisService.set(MiaoshaUserKey.token, token, user);
@@ -92,4 +140,6 @@ public class MiaoshaUserServiceImpl implements MiaoshaUserService {
         cookie.setPath("/");
         response.addCookie(cookie);
     }
+
+
 }

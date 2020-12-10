@@ -14,6 +14,7 @@ public class RedisService {
 
     /**
      * 获取单个对象
+     *
      * @param prefix
      * @param key
      * @param clazz
@@ -37,6 +38,7 @@ public class RedisService {
 
     /**
      * 设置对象
+     *
      * @param prefix
      * @param key
      * @param value
@@ -87,8 +89,30 @@ public class RedisService {
     }
 
     /**
+     * 删除key
+     *
+     * @param prefix
+     * @param key
+     * @return
+     */
+    public boolean delete(KeyPrefix prefix, String key) {
+        Jedis jedis = null;
+
+        try {
+            jedis = jedisPool.getResource();
+            // 生成真正的key
+            String realKey = prefix.getPrefix() + key;
+            long ret = jedis.del(realKey);
+            return ret > 0;
+        } finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
      * 增加值
      * 注意：是原子操作
+     *
      * @param prefix
      * @param key
      * @return
@@ -109,6 +133,7 @@ public class RedisService {
     /**
      * 减少值
      * 注意：是原子操作
+     *
      * @param prefix
      * @param key
      * @return

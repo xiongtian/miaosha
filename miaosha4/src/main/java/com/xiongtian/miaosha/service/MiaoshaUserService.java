@@ -18,5 +18,9 @@ public interface MiaoshaUserService {
 
     boolean login(HttpServletResponse response, LoginVo loginVo);
 
-    MiaoshaUser getByToken(HttpServletResponse response,String token);
+    MiaoshaUser getByToken(HttpServletResponse response, String token);
+
+    MiaoshaUser getById(long id);
+
+    boolean updatePassword(String token, long id,String passwordNew);
 }
