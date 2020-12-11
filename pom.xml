@@ -13,6 +13,7 @@
         <module>miaosha2</module>
         <module>miaosha3</module>
         <module>miaosha4</module>
+        <module>miaosha5</module>
     </modules>
     <!--统一管理jar版本-->
     <properties>
