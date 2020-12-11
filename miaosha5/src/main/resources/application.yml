@@ -23,6 +23,34 @@ spring:
       html-application-cache: true
       compressed: true
     static-locations: classpath:/static/
+
+# rabbitmq
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    #virtual-host: /
+   #消费者数量
+    listener:
+     simple:
+       concurrency: 10
+       max-concurrency: 10
+       # 消费者每次从队列获取的消息数量
+       prefetch: 1
+       # 消费者自动启动
+       auto-startup: true
+       # 消费失败，自动重新入队
+       default-requeue-rejected: true
+   # 启用发送重试
+    template:
+     retry:
+       enabled: true
+       initial-interval: 100
+       max-attempts: 3
+       max-interval: 10000
+       multiplier: 1.0
+
   #Druid
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
