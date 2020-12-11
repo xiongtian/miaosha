@@ -17,4 +17,6 @@ public interface OrderService {
     MiaoshaOrder getMiaoshaOrderByUserIdAndGoodsId(Long userId, long goodsId);
 
     OrderInfo createOrder(MiaoshaUser miaoshaUser, GoodsVo goods);
+
+    OrderInfo getOrderById(long orderId);
 }
