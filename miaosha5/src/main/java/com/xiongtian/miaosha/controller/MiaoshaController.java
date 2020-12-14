@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author xiongtian
@@ -48,6 +50,8 @@ public class MiaoshaController implements InitializingBean {
 
     @Autowired
     private MQSender sender;
+
+    private Map<Long,Boolean> localOverMap = new HashMap<>();
 
     @RequestMapping("/do_miaosha1")
     public String doMiaosha(Model model, MiaoshaUser miaoshaUser, @RequestParam("goodsId") long goodsId) {
@@ -91,9 +95,15 @@ public class MiaoshaController implements InitializingBean {
         if (null == miaoshaUser) {
             return Result.error(CodeMessage.SESSION_ERRO);
         }
+        // 内存标记，减少redis访问量
+        Boolean over = localOverMap.get(goodsId);
+        if (over){
+            return Result.error(CodeMessage.MIAOSHA_OVER);
+        }
         // 预减库存
         Long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
         if (stock < 0) {
+            localOverMap.put(goodsId,true);
             return Result.error(CodeMessage.MIAOSHA_OVER);
         }
         // 判断是否已经秒杀到了
@@ -160,6 +170,7 @@ public class MiaoshaController implements InitializingBean {
         // 系统启动时，将商品加载到缓存中去
         for (GoodsVo goodsVo : goodsVoList) {
             redisService.set(GoodsKey.getMiaoshaGoodsStock, "" + goodsVo.getId(), goodsVo.getStockCount());
+            localOverMap.put(goodsVo.getId(),false);
         }
     }
 }
