@@ -2,8 +2,11 @@ package com.xiongtian.miaosha.service.impl;
 
 import com.xiongtian.miaosha.dao.GoodsDao;
 import com.xiongtian.miaosha.domain.Goods;
+import com.xiongtian.miaosha.domain.MiaoshaOrder;
 import com.xiongtian.miaosha.domain.MiaoshaUser;
 import com.xiongtian.miaosha.domain.OrderInfo;
+import com.xiongtian.miaosha.redis.MiaoshaKey;
+import com.xiongtian.miaosha.redis.RedisService;
 import com.xiongtian.miaosha.service.GoodsService;
 import com.xiongtian.miaosha.service.MiaoshaService;
 import com.xiongtian.miaosha.service.OrderService;
@@ -26,14 +29,53 @@ public class MiaoshaServiceImpl implements MiaoshaService {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    RedisService redisService;
+
     @Override
     @Transactional
     public OrderInfo miaosha(MiaoshaUser miaoshaUser, GoodsVo goods) {
 
         // 减库存，下订单，写入秒杀订单
+        boolean success = goodsService.reduceStock(goods);
+        if (success) {
+            //order_info miaosha_order两个表
+            return orderService.createOrder(miaoshaUser, goods);
+        } else {
+            // 做出商品售光的标记
+            setGoodsOver(goods.getId());
+            return null;
+        }
 
-        goodsService.reduceStock(goods);
-        //order_info miaosha_order两个表
-        return orderService.createOrder(miaoshaUser, goods);
     }
+
+    @Override
+    public long getMiaoshaResult(Long id, long goodsId) {
+        MiaoshaOrder order = orderService.getMiaoshaOrderByUserIdAndGoodsId(id, goodsId);
+        // 成功
+        if (null != order) {
+            return order.getOrderId();
+        } else {
+            boolean isOver = getGoodsOver(goodsId);
+            if (isOver) {
+                // 已售光
+                return -1;
+            } else {
+                // 排队中
+                return 0;
+            }
+        }
+    }
+
+
+    private void setGoodsOver(Long goodsId) {
+        redisService.set(MiaoshaKey.isGoodsOver, "" + goodsId, true);
+    }
+
+    private boolean getGoodsOver(long goodsId) {
+
+        return redisService.exists(MiaoshaKey.isGoodsOver, "" + goodsId);
+    }
+
+
 }

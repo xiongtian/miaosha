@@ -15,6 +15,7 @@ import java.util.Map;
  */
 @Configuration
 public class MQConfig {
+    public static final String MIAOSHA_QUEUE_NAME = "miaosha.queue";
 
     public static final String QUEUE_NAME = "queue";
     public static final String TOPIC_QUEUE_NAME1 = "topic.queue1";

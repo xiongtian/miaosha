@@ -64,10 +64,11 @@ public class OrderServiceIpml implements OrderService {
         orderInfo.setOrderChannel(1);
         orderInfo.setStatus(0);
         orderInfo.setUserId(miaoshaUser.getId());
-        long orderId = orderDao.insert(orderInfo);
+        // 插入之后mybatis会自动的将id塞入
+        orderDao.insert(orderInfo);
         MiaoshaOrder miaoshaOrder = new MiaoshaOrder();
         miaoshaOrder.setGoodsId(goods.getId());
-        miaoshaOrder.setOrderId(orderId);
+        miaoshaOrder.setOrderId(orderInfo.getId());
         miaoshaOrder.setUserId(miaoshaUser.getId());
         orderDao.insertMiaoshaOrder(miaoshaOrder);
 
