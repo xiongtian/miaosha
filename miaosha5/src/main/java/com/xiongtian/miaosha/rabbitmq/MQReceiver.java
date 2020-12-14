@@ -1,5 +1,6 @@
 package com.xiongtian.miaosha.rabbitmq;
 
+import com.xiongtian.miaosha.redis.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -24,5 +25,22 @@ public class MQReceiver {
     @RabbitListener(queues = MQConfig.QUEUE_NAME)
     public void receive(String message) {
         log.info("receive message:"+message);
+    }
+
+    @RabbitListener(queues = MQConfig.TOPIC_QUEUE_NAME1)
+    public void receiveTopic1(Object message) {
+        String msg = RedisService.beanToString(message);
+        log.info("receive topicMessage1: "+msg);
+    }
+    @RabbitListener(queues = MQConfig.TOPIC_QUEUE_NAME2)
+    public void receiveTopic2(Object message) {
+        String msg = RedisService.beanToString(message);
+        log.info("receive topicMessage2: "+msg);
+    }
+
+    @RabbitListener(queues = MQConfig.HEADERS_QUEUE_NAME)
+    public void receicveHeaders(byte[] message) {
+
+        log.info("receive headersMessage1: "+new String(message));
     }
 }

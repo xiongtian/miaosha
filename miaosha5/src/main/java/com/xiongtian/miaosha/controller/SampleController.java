@@ -28,4 +28,28 @@ public class SampleController {
         mqSender.send("hello,rabbitmq");
         return Result.success("hello,rabbitmq");
     }
+
+    @RequestMapping("/mq/topic")
+    @ResponseBody
+    public Result<String> topic(){
+
+        mqSender.sendTopic("hello,rabbitmq");
+        return Result.success("hello,rabbitmq");
+    }
+
+    @RequestMapping("/mq/fanout")
+    @ResponseBody
+    public Result<String> fanout(){
+
+        mqSender.sendFanout("hello,rabbitmq");
+        return Result.success("hello,rabbitmq");
+    }
+
+    @RequestMapping("/mq/headers")
+    @ResponseBody
+    public Result<String> headers(){
+
+        mqSender.sendHeaders("hello,rabbitmq");
+        return Result.success("hello,rabbitmq");
+    }
 }
