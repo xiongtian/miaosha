@@ -188,7 +188,7 @@ public class MiaoshaController implements InitializingBean {
         }
     }
 
-    // TODO
+
     @RequestMapping(value = "/path", method = RequestMethod.GET)
     @ResponseBody
     public Result<String> getMiaoshaPath(Model model, MiaoshaUser miaoshaUser,
