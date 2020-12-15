@@ -6,26 +6,27 @@ import com.xiongtian.miaosha.domain.OrderInfo;
 import com.xiongtian.miaosha.rabbitmq.MQSender;
 import com.xiongtian.miaosha.rabbitmq.MiaoshaMessage;
 import com.xiongtian.miaosha.redis.GoodsKey;
+import com.xiongtian.miaosha.redis.MiaoshaKey;
 import com.xiongtian.miaosha.redis.RedisService;
 import com.xiongtian.miaosha.result.CodeMessage;
 import com.xiongtian.miaosha.result.Result;
 import com.xiongtian.miaosha.service.GoodsService;
 import com.xiongtian.miaosha.service.MiaoshaService;
 import com.xiongtian.miaosha.service.OrderService;
+import com.xiongtian.miaosha.util.MD5Util;
+import com.xiongtian.miaosha.util.UUIDUtil;
 import com.xiongtian.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Author xiongtian
@@ -51,7 +52,7 @@ public class MiaoshaController implements InitializingBean {
     @Autowired
     private MQSender sender;
 
-    private Map<Long,Boolean> localOverMap = new HashMap<>();
+    private Map<Long, Boolean> localOverMap = new HashMap<>();
 
     @RequestMapping("/do_miaosha1")
     public String doMiaosha(Model model, MiaoshaUser miaoshaUser, @RequestParam("goodsId") long goodsId) {
@@ -89,21 +90,28 @@ public class MiaoshaController implements InitializingBean {
      * @param goodsId
      * @return
      */
-    @RequestMapping(value = "/do_miaosha", method = RequestMethod.POST)
+    @RequestMapping(value = "/{path}/do_miaosha", method = RequestMethod.POST)
     @ResponseBody
-    public Result<Integer> miaosha(Model model, MiaoshaUser miaoshaUser, @RequestParam("goodsId") long goodsId) {
+    public Result<Integer> miaosha(Model model, MiaoshaUser miaoshaUser,
+                                   @RequestParam("goodsId") long goodsId,
+                                   @PathVariable("path") String path) {
         if (null == miaoshaUser) {
             return Result.error(CodeMessage.SESSION_ERRO);
         }
+        // 验证path
+        boolean check = miaoshaService.checkPath(miaoshaUser, goodsId, path);
+        if (!check) {
+            return Result.error(CodeMessage.REQUEST_ILLEGAL);
+        }
         // 内存标记，减少redis访问量
         Boolean over = localOverMap.get(goodsId);
-        if (over){
+        if (over) {
             return Result.error(CodeMessage.MIAOSHA_OVER);
         }
         // 预减库存
         Long stock = redisService.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
         if (stock < 0) {
-            localOverMap.put(goodsId,true);
+            localOverMap.put(goodsId, true);
             return Result.error(CodeMessage.MIAOSHA_OVER);
         }
         // 判断是否已经秒杀到了
@@ -139,7 +147,8 @@ public class MiaoshaController implements InitializingBean {
     /**
      * orderId: 成功
      * -1：秒杀失败
-     *0：排队中
+     * 0：排队中
+     *
      * @param model
      * @param miaoshaUser
      * @param goodsId
@@ -170,7 +179,18 @@ public class MiaoshaController implements InitializingBean {
         // 系统启动时，将商品加载到缓存中去
         for (GoodsVo goodsVo : goodsVoList) {
             redisService.set(GoodsKey.getMiaoshaGoodsStock, "" + goodsVo.getId(), goodsVo.getStockCount());
-            localOverMap.put(goodsVo.getId(),false);
+            localOverMap.put(goodsVo.getId(), false);
         }
+    }
+
+    @RequestMapping(value = "/path", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getMiaoshaPath(Model model, MiaoshaUser miaoshaUser,
+                                         @RequestParam("goodsId") long goodsId) {
+        if (null == miaoshaUser) {
+            return Result.error(CodeMessage.SESSION_ERRO);
+        }
+        String path = miaoshaService.createMiaoshaPath(miaoshaUser,goodsId);
+        return Result.success(path);
     }
 }

@@ -14,4 +14,8 @@ public interface MiaoshaService {
     OrderInfo miaosha(MiaoshaUser miaoshaUser, GoodsVo goods);
 
     long getMiaoshaResult(Long id, long goodsId);
+
+    boolean checkPath(MiaoshaUser miaoshaUser, long goodsId, String path);
+
+    String createMiaoshaPath(MiaoshaUser miaoshaUser, long goodsId);
 }

@@ -10,6 +10,8 @@ import com.xiongtian.miaosha.redis.RedisService;
 import com.xiongtian.miaosha.service.GoodsService;
 import com.xiongtian.miaosha.service.MiaoshaService;
 import com.xiongtian.miaosha.service.OrderService;
+import com.xiongtian.miaosha.util.MD5Util;
+import com.xiongtian.miaosha.util.UUIDUtil;
 import com.xiongtian.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,6 +69,38 @@ public class MiaoshaServiceImpl implements MiaoshaService {
         }
     }
 
+
+    /**
+     * 生成秒杀地址
+     *
+     * @param miaoshaUser
+     * @param goodsId
+     * @return
+     */
+    @Override
+    public String createMiaoshaPath(MiaoshaUser miaoshaUser, long goodsId) {
+
+        String str = MD5Util.md5(UUIDUtil.uuid() + "123456");
+        redisService.set(MiaoshaKey.getMiaoshaPath, "" + miaoshaUser.getId() + "_" + goodsId, str);
+        return str;
+    }
+
+    /**
+     * 验证秒杀地址
+     *
+     * @param miaoshaUser
+     * @param goodsId
+     * @param path
+     * @return
+     */
+    @Override
+    public boolean checkPath(MiaoshaUser miaoshaUser, long goodsId, String path) {
+        if (null == miaoshaUser || null == path) {
+            return false;
+        }
+        String pathOld = redisService.get(MiaoshaKey.getMiaoshaPath, "" + miaoshaUser.getId() + "_" + goodsId, String.class);
+        return path.equals(pathOld);
+    }
 
     private void setGoodsOver(Long goodsId) {
         redisService.set(MiaoshaKey.isGoodsOver, "" + goodsId, true);
