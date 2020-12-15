@@ -21,7 +21,7 @@ public class SampleController {
     MQSender mqSender;
 
 
-    @RequestMapping("/mq")
+   /* @RequestMapping("/mq")
     @ResponseBody
     public Result<String> mq(){
 
@@ -51,5 +51,5 @@ public class SampleController {
 
         mqSender.sendHeaders("hello,rabbitmq");
         return Result.success("hello,rabbitmq");
-    }
+    }*/
 }

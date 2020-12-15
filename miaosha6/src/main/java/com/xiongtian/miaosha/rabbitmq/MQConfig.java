@@ -34,12 +34,17 @@ public class MQConfig {
      * Direct模式：交换机 exchange
      *
      */
-    @Bean
     public Queue queue(){
-        /*** name: 名称
-         * durable：是否进行持久化 */
-        return new Queue(QUEUE_NAME,true);
+       /*** name: 名 称
+          durable：是否进行持久化 */
+        return new Queue(MIAOSHA_QUEUE_NAME,true);
     }
+    /*@Bean
+    public Queue queue(){
+        *//*** name: 名称
+         * durable：是否进行持久化 *//*
+        return new Queue(QUEUE_NAME,true);
+    }*/
 
     /**
      * Topic模式：交换机 exchange

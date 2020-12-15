@@ -40,7 +40,7 @@ public class MQReceiver {
      *
      * @param message
      */
-    @RabbitListener(queues = MQConfig.QUEUE_NAME)
+    /*@RabbitListener(queues = MQConfig.QUEUE_NAME)
     public void receive(String message) {
         log.info("receive message:" + message);
     }
@@ -61,7 +61,7 @@ public class MQReceiver {
     public void receicveHeaders(byte[] message) {
 
         log.info("receive headersMessage1: " + new String(message));
-    }
+    }*/
 
     @RabbitListener(queues = MQConfig.MIAOSHA_QUEUE_NAME)
     public void receicveMiaoshaQueue(String message) {
