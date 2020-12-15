@@ -1,0 +1,105 @@
+server:
+  port: 7777
+
+# Thymeleaf
+spring:
+  thymeleaf:
+    cache: false                      #开发配置为false,避免修改模板还要重启服务器
+    enabled: true                     # 是否启用
+    servlet:
+      content-type: text/html         #内容类别,可不用配置
+    encoding: utf-8                   # 编码方式
+    mode: HTML5                       # 模板的模式，支持 HTML, XML TEXT JAVASCRIPT
+    prefix: classpath:/templates/     # 前缀
+    suffix: .html                     # 后缀
+#static
+  resources:
+    add-mappings: true
+    cache:
+      period: 3600
+    chain:
+      cache: true
+      enabled: true
+      html-application-cache: true
+      compressed: true
+    static-locations: classpath:/static/
+
+# rabbitmq
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    #virtual-host: /
+   #消费者数量
+    listener:
+     simple:
+       concurrency: 10
+       max-concurrency: 10
+       # 消费者每次从队列获取的消息数量
+       prefetch: 1
+       # 消费者自动启动
+       auto-startup: true
+       # 消费失败，自动重新入队
+       default-requeue-rejected: true
+   # 启用发送重试
+    template:
+     retry:
+       enabled: true
+       initial-interval: 100
+       max-attempts: 3
+       max-interval: 10000
+       multiplier: 1.0
+
+  #Druid
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: root
+    driver-class-name: org.gjt.mm.mysql.Driver
+    url: jdbc:mysql://localhost:3306/miaosha?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    # 连接池的数据库
+    druid:
+      filters: stat
+      max-active: 2
+      initial-size: 1
+      max-wait: 60000
+      min-idle: 1
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: select 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
+
+
+
+
+
+
+# mybatis
+mybatis:
+  type-aliases-package: com.xiongtian.miaosha.domain # 扫描对象的包（跟数据库的表对应的对象）
+  configuration:
+    map-underscore-to-camel-case: true               # 开启驼峰命名
+    default-fetch-size: 100
+    default-statement-timeout: 3000
+  mapper-locations: classpath:com.xiongtian.miaosha/dao/*.xml # XML文件的位置
+
+
+  # redis
+redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password: 123456
+    timeout: 3
+    poolMaxTotal: 10
+    poolMaxIdle: 10
+    poolMaxWait: 3
+
+
+
+
