@@ -14,6 +14,7 @@ public class CodeMessage {
     public static CodeMessage SERVER_ERROR = new CodeMessage(500100, "服务端异常！");
     public static CodeMessage BIND_ERROR = new CodeMessage(500101, "参数校验异常: %s");
     public static CodeMessage REQUEST_ILLEGAL = new CodeMessage(500102, "请求非法！");
+    public static CodeMessage ACCESS_LIMIT_REACHED = new CodeMessage(500103, "访问太频繁！");
 
 
     // 登录模块：500,2XX
